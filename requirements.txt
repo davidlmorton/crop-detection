@@ -1,0 +1,4 @@
+jupyter == 1.0.0
+jupyter_contrib_nbextensions == 0.3.3
+fire == 0.1.3
+pytorch-sconce == 1.3.0

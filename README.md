@@ -9,14 +9,12 @@ The basic approach is to fine tune a resnet that has been pretrained on imagenet
     - The inputs will be 6xNxN tensors where the 6 channels are the RGB of each of the two images.
       * regardless of the input image sizes, we'll transform them to NxN
     - The targets will be:
-      1) mask (int 0 or 1) - this will be used in the loss function later for masking
-      2) is_cropped_pair (two element tensor of floats) - this will be [1, 0] if the two images are a pair, [0, 1]
+      1) is_cropped_pair (two element tensor of floats) - this will be [1, 0] if the two images are a pair, [0, 1]
       otherwise.
-      3) original_image (two element tensor of floats) - this will be [1, 0] if the first image is the original (and
+      2) is_swapped (two element tensor of floats) - this will be [1, 0] if the first image is the original (and
       the second one is the cropped version) and [0, 1] otherwise.
-      4) top_left_coords (two element tensor of floats) - this will be [x, y] where 0 <= x <= 1 and similarly for y.
+      3) top_left_coords (two element tensor of floats) - this will be [x, y] where 0 <= x <= 1 and similarly for y.
       It represents the x, y coordinates of the cropped image within the original image.
-      5) index (int) - the index of the input in the dataset (just for bookkeeping).
 
   * Then we'll fine-tune a resnet
     - We will load in the weights from pretraining on imagenet.
