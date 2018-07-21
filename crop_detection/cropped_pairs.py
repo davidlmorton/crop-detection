@@ -24,6 +24,7 @@ class CroppedPairs(data.Dataset):
             crop_heights=dict(mean=0.3, std=0.1, min_value=0.01, max_value=0.99),
             hard_mode=False,
             image_size=224,
+            variations=10,
             loader=folder.default_loader,
             extensions=folder.IMG_EXTENSIONS):
 
@@ -34,6 +35,7 @@ class CroppedPairs(data.Dataset):
         self.crop_heights = crop_heights
         self.hard_mode = hard_mode
         self.image_size = image_size
+        self.variations = variations
         self.loader = loader
         self.extensions = extensions
 
@@ -71,7 +73,8 @@ class CroppedPairs(data.Dataset):
         return paths
 
     def get_uncropped_sample(self, index):
-        path = self.paths[index]
+        real_index = index % len(self.paths)
+        path = self.paths[real_index]
         return self.loader(path)
 
     def get_cropped_sample(self, index):
@@ -139,16 +142,21 @@ class CroppedPairs(data.Dataset):
         Returns:
             tuple: (sample, target) where sample is the image, and target the path to the image
         """
+        if index < 0 or index >= len(self):
+            raise IndexError(f"Index {index} out of range [0-{len(self) - 1}]")
+
         sample = self.get_sample(index)
         target = self.get_target(index)
 
         return sample, target
 
     def __len__(self):
-        return len(self.paths)
+        return len(self.paths) * self.variations
 
     def __repr__(self):
         fmt_str = 'Dataset ' + self.__class__.__name__ + '\n'
-        fmt_str += '    Number of images: {}\n'.format(self.__len__())
         fmt_str += '    Root Location: {}\n'.format(self.root)
+        fmt_str += '    Number of images: {}\n'.format(len(self.paths))
+        fmt_str += '    Number of variations per image: {}\n'.format(self.variations)
+        fmt_str += '    Number of samples: {}\n'.format(len(self))
         return fmt_str
