@@ -100,3 +100,41 @@ For one thing, the training process included data augmentation such as cropping,
 That means that the network has learned internal representations that are robust to those kinds of augmentations... the exact kind of augmentation we are hoping to detect here.
 Another reason imagenet pretrained networks might not be great, is that they're all trained on low resolution 224x224px images.
 If the original image is large, and cropping is small, it's likely that there isn't enough information for the network to determine they're `paired`, due to excessive downsampling.
+
+## Update: Now without ML
+
+I have a solution that doesn't use deep learning.
+It solves the substantially simpler problem where the images haven't been resized after cropping.
+It basically looks at the 2d convolution of one image with the other and finds the top left coordinate that way.
+
+It is robust to different jpg qualities.
+It is robust to changing the order of the arguments (trivial now without that images aren't resized after cropping).
+
+The memory and cpu grow as the scale of the images squared (quadradic), however, the error drops much faster than
+quadratic, so in practice you can find a good performance tradeoff value.
+It can be very slow and memory intensive unless you scale down the images first, so there is a --scale option for it.
+
+Here are some examples:
+
+```
+$ tox -e python -- detect_without_ml.py predict simple_images/10001.jpg simple_images/10001_0333_0032_q10.jpg
+...
+simple_images/10001_0333_0032_q10.jpg is a cropped version of simple_images/10001.jpg
+The top left corner of simple_images/10001_0333_0032_q10.jpg can be found in simple_images/10001.jpg at about ((332, 32))
+Took: 125.5ms
+```
+
+```
+$ tox -e python -- detect_without_ml.py predict simple_images/10001_0333_0032_q10.jpg simple_images/10001.jpg
+...
+simple_images/10001_0333_0032_q10.jpg is a cropped version of simple_images/10001.jpg
+The top left corner of simple_images/10001_0333_0032_q10.jpg can be found in simple_images/10001.jpg at about ((332, 32))
+Took: 122.6ms
+```
+
+```
+$ tox -e python -- detect_without_ml.py predict simple_images/10002.jpg simple_images/10001_0333_0032_q10.jpg
+...
+The images are not cropped versions of one another
+Took: 181.1ms
+```
