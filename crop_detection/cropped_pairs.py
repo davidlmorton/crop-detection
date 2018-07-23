@@ -25,6 +25,7 @@ class CroppedPairs(data.Dataset):
             hard_mode=False,
             image_size=224,
             variations=10,
+            cat_dim=0,
             loader=folder.default_loader,
             extensions=folder.IMG_EXTENSIONS):
 
@@ -35,6 +36,7 @@ class CroppedPairs(data.Dataset):
         self.crop_heights = crop_heights
         self.hard_mode = hard_mode
         self.image_size = image_size
+        self.cat_dim = cat_dim
         self.variations = variations
         self.loader = loader
         self.extensions = extensions
@@ -116,7 +118,7 @@ class CroppedPairs(data.Dataset):
         first_tensor = transform(first)
         second_tensor = transform(second)
 
-        return torch.cat((first_tensor, second_tensor))
+        return torch.cat((first_tensor, second_tensor), dim=self.cat_dim)
 
     def get_target(self, index):
         if self.is_paired[index]:
